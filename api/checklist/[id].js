@@ -9,7 +9,6 @@ export default async function handler(req, res) {
     }
 
     try {
-        const user = await authMiddleware(req);
         const { id } = req.query;
 
         if (req.method === 'PUT') {

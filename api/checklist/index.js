@@ -13,19 +13,17 @@ export default async function handler(req, res) {
     }
 
     try {
-        const user = await authMiddleware(req);
         const { trip_id, category, title, description, priority } = req.body;
 
-        // Verify the trip belongs to the user
+        // Verify the trip exists
         const { data: trip } = await supabase
             .from('trips')
             .select('id')
             .eq('id', trip_id)
-            .eq('user_id', user.id)
             .single();
 
         if (!trip) {
-            return res.status(403).json({ error: 'Unauthorized access to trip' });
+            return res.status(404).json({ error: 'Trip not found' });
         }
 
         const { data, error } = await supabase
