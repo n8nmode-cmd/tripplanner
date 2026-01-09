@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tripService } from '../services/api';
-import { Plus, Calendar, MapPin } from 'lucide-react';
+import { Plus, Calendar, MapPin, Trash2 } from 'lucide-react';
 import { formatDate } from '../utils/constants';
 import AddTripModal from '../components/AddTripModal';
 
@@ -29,6 +29,18 @@ const Dashboard = () => {
     const handleTripAdded = () => {
         loadTrips();
         setShowAddModal(false);
+    };
+
+    const handleDeleteTrip = async (id) => {
+        if (!confirm('Are you sure you want to delete this trip? All expenses will be deleted as well.')) return;
+
+        try {
+            await tripService.delete(id);
+            loadTrips();
+        } catch (error) {
+            console.error('Failed to delete trip:', error);
+            alert('Failed to delete trip. Please try again.');
+        }
     };
 
     const getTripStatus = (startDate, endDate) => {
@@ -87,14 +99,25 @@ const Dashboard = () => {
                                     <div
                                         key={trip.id}
                                         onClick={() => navigate(`/trip/${trip.id}`)}
-                                        className="card cursor-pointer hover:scale-105 transition-transform duration-200"
+                                        className="card cursor-pointer hover:scale-[1.02] transition-transform duration-200 relative group"
                                     >
                                         <div className="flex justify-between items-start mb-4">
-                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{trip.title}</h3>
+                                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white pr-8">{trip.title}</h3>
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
                                                 {status.text}
                                             </span>
                                         </div>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteTrip(trip.id);
+                                            }}
+                                            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 dark:bg-gray-800/80 rounded-full"
+                                            title="Delete Trip"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
 
                                         {trip.description && (
                                             <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{trip.description}</p>
