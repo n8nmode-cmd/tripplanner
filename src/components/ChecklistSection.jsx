@@ -75,6 +75,7 @@ const ChecklistSection = ({ tripId }) => {
 
     // const categoryItems = items.filter(item => item.category === activeCategory); // Replaced by filteredItems useMemo
     const categoryInfo = CHECKLIST_CATEGORIES.find(c => c.value === activeCategory);
+    const categoryItems = filteredItems; // Alias for backward compatibility with existing render code
 
     // Replaced original getProgress which used `stats`
     const getProgress = (category) => {
@@ -101,8 +102,8 @@ const ChecklistSection = ({ tripId }) => {
         return <div className="text-center py-8">Loading checklist...</div>;
     }
 
-    const totalItems = items.length;
-    const completedItems = items.filter(item => item.is_completed).length;
+    const totalItems = (items && Array.isArray(items)) ? items.length : 0;
+    const completedItems = (items && Array.isArray(items)) ? items.filter(item => item.is_completed).length : 0;
 
     return (
         <div className="space-y-6">
