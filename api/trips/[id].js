@@ -47,7 +47,15 @@ export default async function handler(req, res) {
         }
 
         if (req.method === 'DELETE') {
-            // Delete trip
+            // Delete trip (and related data manually to ensure cascade)
+
+            // 1. Delete expenses
+            await supabase.from('expenses').delete().eq('trip_id', id);
+
+            // 2. Delete checklist items
+            await supabase.from('checklist_items').delete().eq('trip_id', id);
+
+            // 3. Delete trip
             const { error } = await supabase
                 .from('trips')
                 .delete()
