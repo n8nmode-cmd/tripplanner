@@ -49,6 +49,7 @@ export const getChecklistCategoryInfo = (category) => {
 };
 
 export const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null) return '₹0.00';
     return new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
@@ -56,7 +57,11 @@ export const formatCurrency = (amount) => {
 };
 
 export const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-IN', {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+
+    return d.toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -64,7 +69,11 @@ export const formatDate = (date) => {
 };
 
 export const formatDateTime = (date) => {
-    return new Date(date).toLocaleString('en-IN', {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+
+    return d.toLocaleString('en-IN', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
