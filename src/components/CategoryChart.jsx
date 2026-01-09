@@ -3,6 +3,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { getCategoryInfo } from '../utils/constants';
 
 const CategoryChart = ({ data }) => {
+    if (!data || !Array.isArray(data) || data.length === 0) return null;
+
     const chartData = data.map((item) => {
         const category = getCategoryInfo(item.category);
         return {

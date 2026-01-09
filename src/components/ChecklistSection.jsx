@@ -63,27 +63,46 @@ const ChecklistSection = ({ tripId }) => {
     const handleItemAdded = () => {
         loadChecklist();
         loadStats();
+        // loadStats(); // No longer needed
         setShowAddModal(false);
     };
 
     const handleTemplateApplied = () => {
         loadChecklist();
-        loadStats();
+        // loadStats(); // No longer needed
         setShowTemplates(false);
     };
 
-    const categoryItems = items.filter(item => item.category === activeCategory);
+    // const categoryItems = items.filter(item => item.category === activeCategory); // Replaced by filteredItems useMemo
     const categoryInfo = CHECKLIST_CATEGORIES.find(c => c.value === activeCategory);
 
+    // Replaced original getProgress which used `stats`
     const getProgress = (category) => {
-        if (!stats?.byCategory[category]) return 0;
-        const { total, completed } = stats.byCategory[category];
-        return total > 0 ? Math.round((completed / total) * 100) : 0;
+        if (!items || !Array.isArray(items)) return 0;
+        const categoryItems = items.filter(item => item.category === category);
+        if (categoryItems.length === 0) return 0;
+        const completed = categoryItems.filter(item => item.is_completed).length;
+        return Math.round((completed / categoryItems.length) * 100);
     };
+
+    const overallProgress = useMemo(() => {
+        if (!items || !Array.isArray(items) || items.length === 0) return 0;
+        const total = items.length;
+        const completed = items.filter(item => item.is_completed).length;
+        return Math.round((completed / total) * 100);
+    }, [items]);
+
+    const filteredItems = useMemo(() => {
+        if (!items || !Array.isArray(items)) return [];
+        return items.filter(item => item.category === activeCategory);
+    }, [items, activeCategory]);
 
     if (loading) {
         return <div className="text-center py-8">Loading checklist...</div>;
     }
+
+    const totalItems = items.length;
+    const completedItems = items.filter(item => item.is_completed).length;
 
     return (
         <div className="space-y-6">
@@ -131,8 +150,8 @@ const ChecklistSection = ({ tripId }) => {
                             key={category.value}
                             onClick={() => setActiveCategory(category.value)}
                             className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 transition-all whitespace-nowrap ${isActive
-                                    ? 'border-primary bg-primary/10'
-                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                                ? 'border-primary bg-primary/10'
+                                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                                 }`}
                         >
                             <span className="text-2xl">{category.icon}</span>
