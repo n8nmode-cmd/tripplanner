@@ -1,5 +1,5 @@
 import { supabase } from '../_config/supabase.js';
-import { authMiddleware, handleError, handleCors } from '../_middleware/auth.js';
+import { handleError, handleCors } from '../_middleware/auth.js';
 
 export default async function handler(req, res) {
     handleCors(res);
@@ -9,14 +9,11 @@ export default async function handler(req, res) {
     }
 
     try {
-        const user = await authMiddleware(req);
-
         if (req.method === 'GET') {
-            // Get all trips for user
+            // Get all trips (no user filtering)
             const { data, error } = await supabase
                 .from('trips')
                 .select('*')
-                .eq('user_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -24,14 +21,13 @@ export default async function handler(req, res) {
         }
 
         if (req.method === 'POST') {
-            // Create new trip
+            // Create new trip (no user ID needed)
             const { title, description, start_date, end_date } = req.body;
 
             const { data, error } = await supabase
                 .from('trips')
                 .insert([
                     {
-                        user_id: user.id,
                         title,
                         description,
                         start_date,
@@ -47,6 +43,6 @@ export default async function handler(req, res) {
 
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
-        return handleError(res, error, error.message.includes('authorization') ? 401 : 500);
+        return handleError(res, error, 500);
     }
 }

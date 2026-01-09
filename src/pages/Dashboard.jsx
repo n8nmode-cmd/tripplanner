@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { tripService } from '../services/api';
-import { Plus, LogOut, Calendar, MapPin } from 'lucide-react';
+import { Plus, Calendar, MapPin } from 'lucide-react';
 import { formatDate } from '../utils/constants';
 import AddTripModal from '../components/AddTripModal';
 
@@ -10,7 +9,6 @@ const Dashboard = () => {
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const { user, signOut } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,11 +24,6 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleSignOut = async () => {
-        await signOut();
-        navigate('/login');
     };
 
     const handleTripAdded = () => {
@@ -58,21 +51,12 @@ const Dashboard = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            {/* Header */}
             <header className="bg-white dark:bg-gray-800 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Trips</h1>
-                        <button
-                            onClick={handleSignOut}
-                            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                        >
-                            <LogOut className="w-5 h-5" />
-                            <span>Sign Out</span>
-                        </button>
-                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Trips</h1>
                 </div>
             </header>
+
 
             {/* Main Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

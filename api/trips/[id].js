@@ -1,5 +1,5 @@
 import { supabase } from '../_config/supabase.js';
-import { authMiddleware, handleError, handleCors } from '../_middleware/auth.js';
+import { handleError, handleCors } from '../_middleware/auth.js';
 
 export default async function handler(req, res) {
     handleCors(res);
@@ -9,7 +9,6 @@ export default async function handler(req, res) {
     }
 
     try {
-        const user = await authMiddleware(req);
         const { id } = req.query;
 
         if (req.method === 'GET') {
@@ -18,7 +17,6 @@ export default async function handler(req, res) {
                 .from('trips')
                 .select('*')
                 .eq('id', id)
-                .eq('user_id', user.id)
                 .single();
 
             if (error) throw error;
@@ -41,7 +39,6 @@ export default async function handler(req, res) {
                 .from('trips')
                 .update(updateData)
                 .eq('id', id)
-                .eq('user_id', user.id)
                 .select()
                 .single();
 
@@ -54,8 +51,7 @@ export default async function handler(req, res) {
             const { error } = await supabase
                 .from('trips')
                 .delete()
-                .eq('id', id)
-                .eq('user_id', user.id);
+                .eq('id', id);
 
             if (error) throw error;
             return res.status(200).json({ message: 'Trip deleted successfully' });
@@ -63,6 +59,6 @@ export default async function handler(req, res) {
 
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
-        return handleError(res, error, error.message.includes('authorization') ? 401 : 500);
+        return handleError(res, error, 500);
     }
 }
