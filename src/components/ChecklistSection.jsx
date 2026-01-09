@@ -84,11 +84,10 @@ const ChecklistSection = ({ tripId }) => {
 
     // Replaced original getProgress which used `stats`
     const getProgress = (category) => {
-        if (!items || !Array.isArray(items)) return 0;
-        const categoryItems = items.filter(item => item.category === category);
-        if (categoryItems.length === 0) return 0;
-        const completed = categoryItems.filter(item => item.is_completed).length;
-        return Math.round((completed / categoryItems.length) * 100);
+        // Safe check for stats existence (though logic was replaced by item filtering, keeping this clean if reused)
+        if (!stats?.byCategory?.[category]) return 0;
+        const { total, completed } = stats.byCategory[category];
+        return total > 0 ? Math.round((completed / total) * 100) : 0;
     };
 
     const overallProgress = useMemo(() => {
@@ -160,7 +159,7 @@ const ChecklistSection = ({ tripId }) => {
                                 <div className="font-semibold text-gray-900 dark:text-white">
                                     {category.label}
                                 </div>
-                                {stats?.byCategory[category.value]?.total > 0 && (
+                                {stats?.byCategory?.[category.value]?.total > 0 && (
                                     <div className="text-xs text-gray-500">
                                         {progress}% done
                                     </div>
