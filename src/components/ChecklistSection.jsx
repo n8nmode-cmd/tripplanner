@@ -73,9 +73,14 @@ const ChecklistSection = ({ tripId }) => {
         setShowTemplates(false);
     };
 
-    // const categoryItems = items.filter(item => item.category === activeCategory); // Replaced by filteredItems useMemo
+    const filteredItems = useMemo(() => {
+        if (!items || !Array.isArray(items)) return [];
+        return items.filter(item => item.category === activeCategory);
+    }, [items, activeCategory]);
+
+    // Added safety check alias
     const categoryInfo = CHECKLIST_CATEGORIES.find(c => c.value === activeCategory);
-    const categoryItems = filteredItems; // Alias for backward compatibility with existing render code
+    const categoryItems = filteredItems;
 
     // Replaced original getProgress which used `stats`
     const getProgress = (category) => {
@@ -92,11 +97,6 @@ const ChecklistSection = ({ tripId }) => {
         const completed = items.filter(item => item.is_completed).length;
         return Math.round((completed / total) * 100);
     }, [items]);
-
-    const filteredItems = useMemo(() => {
-        if (!items || !Array.isArray(items)) return [];
-        return items.filter(item => item.category === activeCategory);
-    }, [items, activeCategory]);
 
     if (loading) {
         return <div className="text-center py-8">Loading checklist...</div>;
