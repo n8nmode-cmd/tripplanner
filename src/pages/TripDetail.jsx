@@ -131,7 +131,7 @@ const TripDetail = () => {
                                 <PieChart className="w-5 h-5" />
                                 Expense Breakdown
                             </h2>
-                            {analytics?.categoryBreakdown && analytics.categoryBreakdown.length > 0 ? (
+                            {analytics?.categoryBreakdown && Array.isArray(analytics.categoryBreakdown) && analytics.categoryBreakdown.length > 0 ? (
                                 <CategoryChart data={analytics.categoryBreakdown} />
                             ) : (
                                 <p className="text-gray-500 dark:text-gray-400 text-center py-8">No expenses yet</p>
@@ -149,7 +149,7 @@ const TripDetail = () => {
                             </button>
                         </div>
 
-                        {expenses.length === 0 ? (
+                        {(!expenses || !Array.isArray(expenses) || expenses.length === 0) ? (
                             <div className="card text-center py-12">
                                 <p className="text-gray-500 dark:text-gray-400 mb-4">No expenses yet</p>
                                 <button onClick={() => setShowAddExpense(true)} className="btn-primary">
